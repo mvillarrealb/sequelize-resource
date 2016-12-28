@@ -1,0 +1,40 @@
+{
+  "name": "sequelize-resource",
+  "version": "1.0.0",
+  "description": "Convert any sequelize model into a full fledged REST resource using simple wrappers over express and sequelize",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha -R spec -b test/tests.js"
+  },
+  "keywords": [
+    "sequelizejs",
+    "api",
+    "json",
+    "express",
+    "rest",
+    "nodejs"
+  ],
+  "author": "Marco Villarreal",
+  "license": "MIT",
+  "homepage": "https://github.com/mvillarrealb/sequelize-resource",
+  "repository": "git://github.com/mvillarrealb/sequelize-resource",
+  "engines": {
+    "node": ">= 6.4.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chalk": "^1.1.3",
+    "mocha": "^3.2.0",
+    "superagent": "^3.3.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "pg": "^6.1.2",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.27.0"
+  }
+}
