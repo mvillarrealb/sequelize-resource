@@ -89,18 +89,39 @@ if you wanted to use middleware you had to define the router routes manually(so 
 However It was inmediatly neccesary to use middleware so...lets patch this.
 
 ## Middleware Example 101 a basic function
+
+In this example we have a variable called counter wich will be increased each time
+a request ends, (after middleware executed) if the counter is greater than
+20 in the before middleware then a response will be send with a too many requests
+message, this middlewares will be applied to every route of this controller,
+so is treated as global middleware, global middleware is useful for handling
+stuff like authorization and session handling
+
 ```javascript
 
 const express = require("express");
 const taskRouter = express.Router();
 const Task = db.Task;
+let counter = 0;
 const TaskController = sequelizeResource.createController(Task,{
 
 },{
   primaryKeyURL:"/:id([0-9]+)",
   middleware: {
     before: function(req,res,next){
-
+      req.counter = counter;
+      if( counter > 20){
+        return res.send({
+          message: "Too many requests",
+          requestCount: counter
+        })
+      } else {
+         next();
+      }
+    },
+    after: function(){
+      counter++;
+      console.log(counter);
     }
   }
 });
@@ -109,22 +130,42 @@ TaskController.attachController(taskRouter);
 
 ```
 
-## Middleware Example 102 a case specific
+## Middleware Example 102 a case specific middleware function
+In the previous example we used a middleware which executes on every case,
+now we will use a middleware for some cases(findAll and findOne), this middleware
+will be localized on two cases on the before middleware and will be global
+on the after scenario. However it will check if the parameter
+scenario exists on the request object(req.scenario) if exists it will and
+also exists on visitsCounter object it will increase the counter on the
+given case.
 
 ```javascript
 
 const express = require("express");
 const taskRouter = express.Router();
 const Task = db.Task;
+let visitsCounter = {
+  findOne: 0,
+  findAll: 0
+}
 const TaskController = sequelizeResource.createController(Task,{},{
   primaryKeyURL:"/:id([0-9]+)",
   middleware: {
     before: {
       findAll: function(req,res,next) {
+        req.scenario = "findAll";
         next();
       },
       findOne: function(req,res,next) {
+        req.scenario = "findOne";
         next();
+      },
+    },
+    after: function(req,res){
+      if(req && req.scenario){
+        if(visitsCounter[req.scenario]) {
+           visitsCounter[req.scenario] += 1;
+        }
       }
     }
   }
@@ -134,7 +175,96 @@ TaskController.attachController(taskRouter);
 
 
 ```
+# Response Interceptor(Since patch 1.0.1)
 
+A new feature called responseSender or response interceptor were added on patch 1.0.1, this is
+just like middleware a global function or local object that allow us to catch the response
+before being sent to the client and modify it at our will, this is helpful if the response
+format provided by sequelize-resource is not suitable for your needs or you need to add
+extra field to the response. The response sender works as a middleware function
+which receives request(req), response(res), next middleware and the response to be sent.
+At this point you can format your response or modify response object.
+
+## Example Change response format using sendResponse global function
+
+In this example we use sendResponse property as a function wich will redefine the response format
+provided by default to a new one.
+
+```javascript
+
+const express = require("express");
+const taskRouter = express.Router();
+const Task = db.Task;
+let visitsCounter = {
+  findOne: 0,
+  findAll: 0
+}
+
+const TaskController = sequelizeResource.createController(Task,{},{
+  primaryKeyURL:"/:id([0-9]+)",
+  sendResponse: (req,res,next,response) => {
+    res.status(response.status).send({
+      data: response.data,
+      counter: visitsCounter
+    });
+  },
+  middleware: {
+    findAll: function(req,res,next) {
+      req.scenario = "findAll";
+      next();
+    },
+    findOne: function(req,res,next) {
+      req.scenario = "findOne";
+      next();
+    },
+    after: function(req,res) {
+      if(req && req.scenario){
+        if(visitsCounter[req.scenario]) {
+          visitsCounter[req.scenario] += 1;
+        }
+      }
+    }
+  }
+});
+
+TaskController.attachController(taskRouter);
+
+```
+
+## Example change response format only on findAll case(local sender function)
+In this case we use an hipotetical async function called getPendingTaskCount,
+wich receives a callback as parameter, in this callback we got two params
+error(error first callback), and the counter if the error is not null
+then an 500 status is sent to the client, otherwise the counter is
+appended to data property in the prebuild response and then is sent
+to the client, this example is a useful use case, sometimes we will need
+to add additional computations to default behaviors and responses.
+
+```javascript
+
+const express = require("express");
+const taskRouter = express.Router();
+const Task = db.Task;
+
+const TaskController = sequelizeResource.createController(Task,{},{
+  primaryKeyURL:"/:id([0-9]+)",
+  sendResponse: {
+    findAll : (req,res,next,response) => {
+      Task.getPendingTaskCount(function(err,counter){
+        if(err) {
+          return res.status(500).send(err);
+        }
+        response.data.pending_tasks = counter;
+        res.send(response);
+      });
+
+    }
+  }
+});
+
+TaskController.attachController(taskRouter);
+
+```
 # Test
 
 This module was developed using a basic TDD approach using mocha and chai, two test are available
