@@ -1,6 +1,6 @@
 {
   "name": "sequelize-resource",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert any sequelize model into a full fledged REST resource using simple wrappers over express and sequelize",
   "main": "index.js",
   "directories": {
