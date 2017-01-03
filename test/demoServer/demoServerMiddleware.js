@@ -21,38 +21,6 @@ const controller = new CrudController(resource,{
     response.scenario = req.scenario;
     res.status(response.status).send(response);
   },
-  /*sendResponse: {
-    findAll: (req,res,next,response) => {
-      response.page_visits = visitsCounter;
-      response.scenario = req.scenario;
-      res.status(response.status).send(response);
-    },
-    findOne: (req,res,next,response) => {
-      response.page_visits = visitsCounter;
-      response.scenario = req.scenario;
-      res.status(response.status).send(response);
-    },
-    create: (req,res,next,response) => {
-      response.page_visits = visitsCounter;
-      response.scenario = req.scenario;
-      res.status(response.status).send(response);
-    },
-    update: (req,res,next,response) => {
-      response.page_visits = visitsCounter;
-      response.scenario = req.scenario;
-      res.status(response.status).send(response);
-    },
-    destroy: (req,res,next,response) => {
-      response.page_visits = visitsCounter;
-      response.scenario = req.scenario;
-      res.status(response.status).send(response);
-    },
-    bulkCreate: (req,res,next,response) => {
-      response.page_visits = visitsCounter;
-      response.scenario = req.scenario;
-      res.status(response.status).send(response);
-    }
-  },*/
   middleware: {
     before: {
       findAll: function(req,res,next) {
