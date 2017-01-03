@@ -80,6 +80,61 @@ const sequelizeResource = require("sequelize-resource")(sequelize,Sequelize);
 
 You can find a [TODO api](examples/todo-api/README.md) on examples directory with a step by step development guide
 
+# Middleware(Since version 1.0.1)
+
+Since patch 1.0.1 middleware is enabled to the generated controllers, in the previous version
+there wasn't a fancy way to implement middleware on the generated controllers(using attachController),
+if you wanted to use middleware you had to define the router routes manually(so long attachController magic).
+
+However It was inmediatly neccesary to use middleware so...lets patch this.
+
+## Middleware Example 101 a basic function
+```javascript
+
+const express = require("express");
+const taskRouter = express.Router();
+const Task = db.Task;
+const TaskController = sequelizeResource.createController(Task,{
+
+},{
+  primaryKeyURL:"/:id([0-9]+)",
+  middleware: {
+    before: function(req,res,next){
+
+    }
+  }
+});
+TaskController.attachController(taskRouter);
+
+
+```
+
+## Middleware Example 102 a case specific
+
+```javascript
+
+const express = require("express");
+const taskRouter = express.Router();
+const Task = db.Task;
+const TaskController = sequelizeResource.createController(Task,{},{
+  primaryKeyURL:"/:id([0-9]+)",
+  middleware: {
+    before: {
+      findAll: function(req,res,next) {
+        next();
+      },
+      findOne: function(req,res,next) {
+        next();
+      }
+    }
+  }
+});
+
+TaskController.attachController(taskRouter);
+
+
+```
+
 # Test
 
 This module was developed using a basic TDD approach using mocha and chai, two test are available

@@ -9,7 +9,7 @@ const model     = db.person;
 describe("sequelize Model test",function(){
   before(function(done){
     console.log(chalk.blue("Starting mock test server"));
-    db.sequelize.sync({force: true}).then(()=>{
+    db.sequelize.sync({force: true}).then(() => {
       return done();
     })
     .catch((error) => {

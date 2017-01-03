@@ -4,14 +4,14 @@ let server       = null;
 const express    = require("express");
 const app        = express();
 const router     = express.Router();
-const db         = require("./config/db");
+const db         = require("../config/db");
 
 const Sequelize = db.Sequelize;
 const sequelize = db.sequelize;
 const model     = db.person;
 
-const CrudController = require("../lib/CrudController");
-const SequelizeModel = require("../lib/SequelizeModel")(sequelize,Sequelize);
+const CrudController = require("../../lib/CrudController");
+const SequelizeModel = require("../../lib/SequelizeModel")(sequelize,Sequelize);
 
 const resource = new SequelizeModel(model);
 const controller = new CrudController(resource,{

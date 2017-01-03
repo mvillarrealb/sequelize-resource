@@ -4,9 +4,10 @@ const expect = require("chai").expect;
 const should = require("chai").should;
 const request = require("superagent");
 const internalApiTest = require("./internalApiTester")();
+
 describe("CrudController class tests",function() {
   let baseUrl = "http://localhost:8000";
-  let app = require("./demoServer/demoServer");
+  let app = require("./demoServer/demoServerMiddleware");
   let port = 8000;
   let personId = 9999;
   let persons = [
@@ -47,6 +48,7 @@ describe("CrudController class tests",function() {
     console.log(chalk.blue("Stopping mock test server"));
     app.stop(done);
   });
+
   internalApiTest({
     baseUrl: baseUrl,
     endPoint: "/persons",
@@ -69,6 +71,9 @@ describe("CrudController class tests",function() {
     bulkData: persons,
     assert: {
       findOne: function(err,response,parsedResponse) {
+
+        expect(parsedResponse).to.have.property('page_visits');
+        expect(parsedResponse).to.have.property('scenario',"findOne");
         expect(parsedResponse).to.have.deep.property('data.id');
         expect(parsedResponse).to.have.deep.property('data.name');
         expect(parsedResponse).to.have.deep.property('data.last_name');
@@ -77,6 +82,8 @@ describe("CrudController class tests",function() {
 
       },
       findAll: function(err,response,parsedResponse){
+        expect(parsedResponse).to.have.property('page_visits');
+        expect(parsedResponse).to.have.property('scenario',"findAll");
         expect(parsedResponse).to.have.deep.property('data.rows[0].id');
         expect(parsedResponse).to.have.deep.property('data.rows[0].name');
         expect(parsedResponse).to.have.deep.property('data.rows[0].last_name');
@@ -85,6 +92,9 @@ describe("CrudController class tests",function() {
 
       },
       bulkCreate: function(err,response,parsedResponse){
+        expect(parsedResponse).to.have.property('page_visits');
+        expect(parsedResponse).to.have.property('scenario',"bulkCreate");
+
         expect(parsedResponse).to.have.deep.property('data[0].id');
         expect(parsedResponse).to.have.deep.property('data[0].name');
         expect(parsedResponse).to.have.deep.property('data[0].last_name');
@@ -93,6 +103,9 @@ describe("CrudController class tests",function() {
 
       },
       create: function(err,response,parsedResponse) {
+        expect(parsedResponse).to.have.property('page_visits');
+        expect(parsedResponse).to.have.property('scenario',"create");
+
         expect(parsedResponse).to.have.deep.property('data.id');
         expect(parsedResponse).to.have.deep.property('data.name');
         expect(parsedResponse).to.have.deep.property('data.last_name');
@@ -100,6 +113,9 @@ describe("CrudController class tests",function() {
         expect(parsedResponse).to.have.deep.property('data.birth_date');
       },
       update: function(err,response,parsedResponse) {
+        expect(parsedResponse).to.have.property('page_visits');
+        expect(parsedResponse).to.have.property('scenario',"update");
+
         expect(parsedResponse).to.have.deep.property('data.id');
         expect(parsedResponse).to.have.deep.property('data.name');
         expect(parsedResponse).to.have.deep.property('data.last_name');
@@ -110,7 +126,14 @@ describe("CrudController class tests",function() {
         expect(parsedResponse).to.have.deep.property('data.last_name',"Villarreal Benites");
       },
       destroy: function(err,response,parsedResponse){
+        expect(parsedResponse).to.have.property('page_visits');
+        expect(parsedResponse).to.have.property('scenario',"destroy");
 
+        expect(parsedResponse).to.have.deep.property('data.id');
+        expect(parsedResponse).to.have.deep.property('data.name');
+        expect(parsedResponse).to.have.deep.property('data.last_name');
+        expect(parsedResponse).to.have.deep.property('data.identity_doc');
+        expect(parsedResponse).to.have.deep.property('data.birth_date');
       }
     }
   });
